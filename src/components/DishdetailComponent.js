@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Card,  CardText, CardBody, CardTitle, CardImg, Breadcrumb, BreadcrumbItem} from "reactstrap";
+import { Card,  CardText, CardBody, CardTitle, CardImg, Breadcrumb, BreadcrumbItem, Modal, ModalBody, ModalHeader, Button, Label
+    , Row, Col} from "reactstrap";
 import { Link } from 'react-router-dom'
-
+import {Control, LocalForm, Errors} from 'react-redux-form'
 
     function RenderDish({dish}){
         if(dish != null || dish != undefined){
@@ -47,41 +48,107 @@ import { Link } from 'react-router-dom'
     }
     
 
+    const maxLength = (len) => (val) => !(val) || (val.length <= len)
+    const minLenght = (len) => (val) => (val) && (val.length >= len)
 
-
-    
-    
-    
-
-    const DishDetail = (props) => {
+    class DishDetail extends Component{
         
+    
+        constructor(props) {
+            super(props);
+            this.state = {
+                isOpen: false,
+                
+            };
+            this.toggleOpen = this.toggleOpen.bind(this)
+            this.handleSubmitComments = this.handleSubmitComments.bind(this)
+          }
+        
+        toggleOpen(){
+            this.setState({
+                isOpen : !this.state.isOpen
+            })
+        }
 
-        return(
-            <div className="container">
-                <div className="row">
-                    <Breadcrumb>
-                        <BreadcrumbItem>
-                            <Link to='/menu'>Menu
-                            </Link>
-                        </BreadcrumbItem>
-                        <BreadcrumbItem active> 
-                            {props.dish.name}  
-                        </BreadcrumbItem>
-                    </Breadcrumb>
-                    <div className="col-12">
-                        <h3>{props.dish.name}</h3>
-                        <hr/>
+
+        handleSubmitComments(values, addComment, dishId){
+            addComment(dishId, values.rating, values.author, values.comment);
+        }
+
+
+
+        render(){
+
+
+            return (
+                <div className="container">
+                    <div className="row">
+                        <Breadcrumb>
+                            <BreadcrumbItem>
+                                <Link to='/menu'>Menu
+                                </Link>
+                            </BreadcrumbItem>
+                            <BreadcrumbItem active> 
+                                {this.props.dish.name}  
+                            </BreadcrumbItem>
+                        </Breadcrumb>
+                        <div className="col-12">
+                            <h3>{this.props.dish.name}</h3>
+                            <hr/>
+                        </div>
                     </div>
-                </div>
-                <div className="row">
-                    <RenderDish dish={props.dish}></RenderDish>
-                    <div className="col-12 col-md-5">
-                        <h4>Comments</h4>
-                        <RenderComments comments={props.comments}></RenderComments>
+                    <div className="row">
+                        <RenderDish dish={this.props.dish}></RenderDish>
+                        <div className="col-12 col-md-5">
+                            <h4>Comments</h4>
+                            <RenderComments comments={this.props.comments}
+                                ></RenderComments>
+                            <Button color="white" onClick={this.toggleOpen}><i className="fa fa-pencil"></i> Submit Comment</Button>
+                        </div>
                     </div>
+                    <Modal isOpen={this.state.isOpen} toggle={this.toggleOpen}>
+                        <ModalHeader><h4>Submit Comment</h4></ModalHeader>
+                        <ModalBody>
+                            <LocalForm onSubmit={(values) => this.handleSubmitComments(values, this.props.addComment, this.props.dishId)}>
+                                <Row className="form-group" >
+                                    <Label md={2} htmlFor="Rating">Rating</Label>
+                                    <Col md={12}>
+                                        <Control.select model=".rating" name="rating" className="form-control">
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                        </Control.select>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Label md={4} htmlFor="name">Your Name</Label>
+                                    <Col md={12}>
+                                        <Control.text model=".name" name="name" className="form-control" placeholder="Your Name" 
+                                        validators={{ minLenght: minLenght(3), maxLength: maxLength(15)}}></Control.text>
+                                        <Errors className="text-danger" model=".name" show="touched"
+                                        messages={{ 
+                                            minLenght: 'Must be grater than 2 characters ',
+                                            maxLength:'Must be 15 characters or less ' 
+                                        }}></Errors>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Label md={2} htmlFor="Comment">
+                                        Comment
+                                    </Label>
+                                    <Col md={12}>
+                                        <Control.textarea model=".comment" name="comment" className="form-control" rows="6"></Control.textarea>
+                                    </Col>
+                                </Row>
+                                <Button color="primary" className="mt-2 col-2" type="submit" >Submit</Button>
+                            </LocalForm>
+                        </ModalBody>
+                    </Modal>
                 </div>
-            </div>
-        )
+            )   
+        }
     }
 
 
