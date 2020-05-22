@@ -74,8 +74,8 @@ import {baseUrl} from '../shared/baseURL'
         }
 
 
-        handleSubmitComments(values, addComment, dishId){
-            addComment(dishId, values.rating, values.author, values.comment);
+        handleSubmitComments(values, postComment, dishId){
+            postComment(dishId, values.rating, values.author, values.comment);
         }
 
 
@@ -128,7 +128,7 @@ import {baseUrl} from '../shared/baseURL'
                         <Modal isOpen={this.state.isOpen} toggle={this.toggleOpen}>
                             <ModalHeader><h4>Submit Comment</h4></ModalHeader>
                             <ModalBody>
-                                <LocalForm onSubmit={(values) => this.handleSubmitComments(values, this.props.addComment, this.props.dishId)}>
+                                <LocalForm onSubmit={(values) => this.handleSubmitComments(values, this.props.postComment, this.props.dishId)}>
                                     <Row className="form-group" >
                                         <Label md={2} htmlFor="Rating">Rating</Label>
                                         <Col md={12}>
